@@ -1,0 +1,41 @@
+{
+    "dag_config":{
+        "dag_name" : "datalake_table_monitering_job",
+        "schedule_time" : "0 3 * * *"
+    },
+    "sources" : [
+     
+        {
+            "name" : "ameyo",
+            "database_type" : "postgresql",
+            "param" : {
+                "host": "localhost",
+                "port": "5432",
+                "user": "postgres",
+                "password": "password"
+            }
+        }
+    ],
+    "destinations" : [
+        {
+            "name" : "destination",
+            "database_type" : "postgresql",
+            "param" : {
+                "host": "localhost",
+                "port": "5432",
+                "database": "datalake_audit",
+                "table_name": "datalake_source_tracker",
+                "user": "postgres",
+                "password": "password"
+            }
+        }
+    ]
+}
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

@@ -1,0 +1,24 @@
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "app/utils/__pycache__": true,
+        "app/utils/datalake_audit/__pycache__": true,
+        "app/connectors/__pycache__": true,
+        "app/__pycache__": true,
+        ".vscode": true,
+        "__pycache__": true
+    },
+    "hide-files.files": [
+        "app/utils/__pycache__",
+        "app/utils/datalake_audit/__pycache__",
+        "app/connectors/__pycache__",
+        "app/__pycache__",
+        ".vscode",
+        "__pycache__"
+    ]
+}

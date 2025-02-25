@@ -1,0 +1,52 @@
+{
+    "dag_config": {
+        "dag_name": "ameyo_audit_db_config_dag",
+        "schedule_time": "0 3 * * *"
+    },
+    "sources": {
+        "name": "ameyo",
+        "database_type": "postgresql",
+        "param": {
+            "host": "localhost",
+            "port": "5432",
+            "user": "postgres",
+            "password": "password"
+        }
+    },
+    "destination": {
+        "name": "datalake_audit",
+        "params": {
+            "host": "localhost",
+            "port": "5432",
+            "database": "datalake_audit",
+            "user": "postgres",
+            "password": "password"
+        }
+    },
+    "table_queries": [
+        {
+            "table_name": "void_1",
+            "table_params": {
+                "data_query": "SELECT * FROM void_1 WHERE 2025-02-21 >= '{start_date_time}' AND 2025-02-21 < '{end_date_time}'",
+                "date_column": "2025-02-21",
+                "min_date_query": "SELECT min(2025-02-21) AS min_date FROM void_1",
+                "total_count_query": "SELECT count(*) AS total_count FROM void_1 WHERE 2025-02-21 >= '{start_date_time}' AND 2025-02-21 < '{end_date_time}' ORDER BY {date_col} ASC, name ASC OFFSET {offset} LIMIT {batch_size}",
+                "schema": {
+                    "id": "int",
+                    "name": "varchar(20)"
+                },
+                "fetch_type": "batch",
+                "mode": "append",
+                "executor_memory": 2,
+                "executor_cores": 2,
+                "driver_memory": 10,
+                "min_executors": 1,
+                "max_executors": 4,
+                "initial_executors": 1,
+                "driver_cores": 2,
+                "batch_size": 1000,
+                "batch_interval_in_hr": 4
+            }
+        }
+    ]
+}

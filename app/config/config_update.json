@@ -1,0 +1,27 @@
+{
+    "dag_config":{
+        "dag_name" : "config_update_dag",
+        "schedule_time" : "0 3 * * *"
+    },
+    "source" : [
+        {
+            "name" : "datalake_audit",
+            "database_type" : "postgresql",
+            "param" : {
+                "host": "localhost",
+                "port": "5432",
+                "database": "datalake_audit",
+                "user": "postgres",
+                "password": "password"
+            }
+        }
+    ]
+}
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

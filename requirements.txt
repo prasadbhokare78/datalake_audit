@@ -1,0 +1,6 @@
+pyarrow
+pandas
+python-dotenv
+boto3
+pyspark
+apache-airflow
