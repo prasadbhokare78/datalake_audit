@@ -30,5 +30,5 @@ class DatalakeHandler:
         """Returns the Oracle destination connector."""
         
         fetch_data = source_oracle_data(source_connector, self.source_name, self.source_type)
-        missing_data = missing_destination(destination_connector, fetch_data)
-        update_postgres(missing_data, destination_connector, self.destination_table)
+        # missing_data = missing_destination(destination_connector, fetch_data)
+        # update_postgres(missing_data, destination_connector, self.destination_table)
