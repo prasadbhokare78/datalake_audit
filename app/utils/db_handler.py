@@ -15,16 +15,16 @@ class DatalakeHandler:
     def postgres_handler(self, source_connector, destination_connector):
         """Returns the PostgreSQL destination connector."""
         pass
-        # fetch_data = source_postgres_data(source_connector, self.source_name, self.source_type)
-        # missing_data = missing_destination(destination_connector, fetch_data)
-        # update_postgres(missing_data, destination_connector, self.destination_table)
+        fetch_data = source_postgres_data(source_connector, self.source_name, self.source_type)
+        missing_data = missing_destination(destination_connector, fetch_data)
+        update_postgres(missing_data, destination_connector, self.destination_table)
 
     def mssql_handler(self, source_connector, destination_connector):
         """Returns the MSSQL destination connector."""
         pass
-        # fetch_data = source_mssql_data(source_connector, self.source_name, self.source_type)
-        # missing_data = missing_destination(destination_connector, fetch_data)
-        # update_postgres(missing_data, destination_connector, self.destination_table)
+        fetch_data = source_mssql_data(source_connector, self.source_name, self.source_type)
+        missing_data = missing_destination(destination_connector, fetch_data)
+        update_postgres(missing_data, destination_connector, self.destination_table)
 
     def oracle_handler(self, source_connector, destination_connector):
         """Returns the Oracle destination connector."""

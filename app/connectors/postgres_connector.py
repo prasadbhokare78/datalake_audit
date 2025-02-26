@@ -49,20 +49,10 @@ class PostgresConnector:
     def set_url(self, database):
         """Set the schema (namespace) for PostgreSQL queries."""
         self.jdbc_url = f"jdbc:postgresql://{self.host}:{self.port}/{database}"
-
-    def reinit_spark_session(self):
-        try:
-            self.spark.stop()
-            self.spark = SparkSession.builder \
-                .appName("PostgresConnector") \
-                .config("spark.jars", self.jar_path) \
-                .getOrCreate()
-            print("Spark session reinitialized successfully.")
-        except Exception as e:
-            raise Exception(str(e))
         
 
     def read_table(self, query):
+        print(self.jdbc_url, self.user, self.password, self.driver)
         while self.read_attempts < self.max_retries:
             try:
                 return self.spark.read \

@@ -1,9 +1,7 @@
 from pyspark.sql import SparkSession
-# from app.utils.s3_utils import S3Utils
 import time
 from app.jar_files.jar_manager import JarManager
 from pyspark.sql.functions import year as spark_year, month as spark_month, dayofmonth as spark_dayofmonth, col
-# from app.constants.constant_error import SparkSessionError, DataReadError, DataWriteError
 
 class OracleConnector:
     def __init__(self, host, port, user, password):
@@ -72,8 +70,7 @@ class OracleConnector:
             df = self.spark.createDataFrame(results, schema=schema_list)
             return df
         except Exception as e:
-            print(f"Error creating DataFrame: {e}")
-            raise Exception(str(e))
+            return []
         
     def read_table(self, query):
         print(self.jdbc_url, self.password, self.user, self.driver)

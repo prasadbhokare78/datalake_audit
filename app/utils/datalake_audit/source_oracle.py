@@ -6,7 +6,7 @@ def source_oracle_data(source_connector, source_name, database_type):
     query = """
         SELECT DISTINCT OWNER 
         FROM ALL_TABLES 
-        WHERE OWNER = 'MYUSER' 
+        WHERE OWNER = 'SYSTEM' 
     """
     
     databases_df = source_connector.read_table(query)
@@ -52,6 +52,6 @@ def source_oracle_data(source_connector, source_name, database_type):
     oracle_df = source_connector.create_dataframe(results, schema)
 
     print("Oracle Data:")
-    oracle_df.show()
+    # oracle_df.show()
 
     return oracle_df
