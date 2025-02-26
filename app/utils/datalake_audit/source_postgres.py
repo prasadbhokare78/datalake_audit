@@ -1,4 +1,4 @@
-from pyspark.sql.functions import col, to_json, collect_list, struct, current_date
+from pyspark.sql.functions import col, collect_list
 import json
 
 def source_postgres_data(source_connector, source_name, database_type):

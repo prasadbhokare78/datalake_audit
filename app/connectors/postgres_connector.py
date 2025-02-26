@@ -34,7 +34,7 @@ class PostgresConnector:
             try:
                 self.spark = SparkSession.builder \
                     .appName("PostgresConnector") \
-                    .config("spark.jars", self.jar_path) \
+                    .config("spark.jars", self.all_jdbc_drivers_path) \
                     .getOrCreate()
                 break
             except Exception as e:

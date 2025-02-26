@@ -7,10 +7,8 @@ from app.utils.audit_manager import DatalakeAuditHandler
 from dotenv import load_dotenv # type: ignore 5
 from pydantic import ValidationError # type: ignore
 
-# Load environment variables
 load_dotenv()
 
-# Define current directory and config folder
 current_directory = os.path.dirname(os.path.abspath(__file__))
 config_folder = os.path.join(current_directory, 'app', 'config')
 
@@ -68,8 +66,7 @@ if os.path.exists(config_file_path):
 
 
         globals()[dag_name] = dag
-    except (FileNotFoundError, json.JSONDecodeError, ValidationError, KeyError, AttributeError) as e:
+    except (FileNotFoundError, json.JSONDecodeError, KeyError, AttributeError) as e:
         print(f"Error processing config file: {e}")
-# Set task dependencies (optional if it's just one task)
 
 

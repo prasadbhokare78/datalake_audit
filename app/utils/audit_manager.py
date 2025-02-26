@@ -63,20 +63,15 @@ class DatalakeAuditHandler:
             "destination_params": self.destination_params,
         }
 
-        print(config_data)
-
-        # print(self.destination_params)
-
         if self.source_type == "mssql":
             DatalakeHandler(config_data).mssql_handler(source_connector, destination_connector)
         elif self.source_type == "postgresql":
             DatalakeHandler(config_data).postgres_handler(source_connector, destination_connector)
         elif self.source_type == "oracle":
             DatalakeHandler(config_data).oracle_handler(source_connector, destination_connector)
-        # else:
-        #     raise ValueError("Unsupported database type")
+        else:
+            raise ValueError("Unsupported database type")
 
-        # print('done')
         
     def etl(self):
 
