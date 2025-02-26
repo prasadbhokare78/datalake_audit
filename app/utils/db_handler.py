@@ -1,5 +1,7 @@
-from app.utils.datalake_audit.audit import source_mssql_data, source_oracle_data, update_postgres, missing_destination
+from app.utils.datalake_audit.audit import source_oracle_data, update_postgres, missing_destination
 from app.utils.datalake_audit.source_postgres import source_postgres_data
+from app.utils.datalake_audit.source_mssql import source_mssql_data
+from app.utils.datalake_audit.source_oracle import source_oracle_data
 
 class DatalakeHandler:
     def __init__(self, config_data):

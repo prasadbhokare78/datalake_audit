@@ -11,7 +11,14 @@
         "app/connectors/__pycache__": true,
         "app/__pycache__": true,
         ".vscode": true,
-        "__pycache__": true
+        "__pycache__": true,
+        "app/connectors/__init__.py": true,
+        "app/jar_files/__pycache__": true,
+        "app/utils/__init__.py": true,
+        "app/utils/datalake_audit/__init__.py": true,
+        "app/__init__.py": true,
+        "requirements.txt": true,
+        "app/utils/datalake_audit/audit_v0.py": true
     },
     "hide-files.files": [
         "app/utils/__pycache__",
@@ -19,6 +26,13 @@
         "app/connectors/__pycache__",
         "app/__pycache__",
         ".vscode",
-        "__pycache__"
+        "__pycache__",
+        "app/connectors/__init__.py",
+        "app/jar_files/__pycache__",
+        "app/utils/__init__.py",
+        "app/utils/datalake_audit/__init__.py",
+        "app/__init__.py",
+        "requirements.txt",
+        "app/utils/datalake_audit/audit_v0.py"
     ]
 }
