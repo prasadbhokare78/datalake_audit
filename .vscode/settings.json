@@ -17,8 +17,7 @@
         "app/utils/__init__.py": true,
         "app/utils/datalake_audit/__init__.py": true,
         "app/__init__.py": true,
-        "requirements.txt": true,
-        "app/utils/datalake_audit/audit_v0.py": true
+        "requirements.txt": true
     },
     "hide-files.files": [
         "app/utils/__pycache__",
@@ -32,7 +31,6 @@
         "app/utils/__init__.py",
         "app/utils/datalake_audit/__init__.py",
         "app/__init__.py",
-        "requirements.txt",
-        "app/utils/datalake_audit/audit_v0.py"
+        "requirements.txt"
     ]
 }
