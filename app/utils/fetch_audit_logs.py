@@ -1,6 +1,4 @@
-import json
 import datetime
-from pyspark.sql import SparkSession
 from datetime import datetime, timedelta
 
 def fetch_audit_logs(connector):
@@ -16,8 +14,6 @@ def fetch_audit_logs(connector):
                                  "hour_interval", "mode", "batch_size", "date_col", "executor_memory", "executor_cores", 
                                  "driver_memory", "min_executor", "max_executors", "initial_executors", "driver_cores").collect()
     
-    # connector.stop_spark_session()
-
     valid_records = [
         (
             row.source_name, row.database_name, row.table_name, row.table_schema, row.fetch_type, 

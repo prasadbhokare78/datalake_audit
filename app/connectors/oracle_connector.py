@@ -7,7 +7,6 @@ class OracleConnector:
     def __init__(self, host, port, user, password):
         self.service = "FREEPDB1"
         self.jdbc_url = f"jdbc:oracle:thin:@{host}:{port}/{self.service}"
-        self.jar_path = "/home/iauro/airflow/dags/app/jar_files/ojdbc8.jar"
         self.driver = "oracle.jdbc.OracleDriver"
         self.user = user
         self.password = password
@@ -21,7 +20,9 @@ class OracleConnector:
         
         jar_manager = JarManager(
             required_jars=[
-                'ojdbc8.jar'
+                'postgresql-42.7.4.jar',
+                'ojdbc8.jar',
+                'mssql-jdbc-12.8.1.jre11.jar' 
             ]
         )
 
@@ -73,7 +74,6 @@ class OracleConnector:
             return []
         
     def read_table(self, query):
-        print(self.jdbc_url, self.password, self.user, self.driver)
         while self.read_attempts < self.max_retries:
             try:
                 return self.spark.read \
@@ -99,7 +99,6 @@ class OracleConnector:
                              .withColumn("day", spark_dayofmonth(col(date_column)))
             print(f"DataFrame columns after adding partition columns: {df_data.columns}")
 
-            # Write the DataFrame to S3 with partitioning
             df_data.write.partitionBy("year", "month", "day") \
                          .mode("append") \
                          .parquet(destination_path)

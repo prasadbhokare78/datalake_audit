@@ -53,8 +53,6 @@ class DatalakeAuditHandler:
         """Get the names of the source and destination databases."""
         source_connector = self.get_source_connector()
         destination_connector = self.get_destination_connector()
-        print('source_database', source_connector)
-        print('destination_database', destination_connector)
 
         config_data = {
             "source_name": self.source_name,
@@ -71,11 +69,13 @@ class DatalakeAuditHandler:
             audit_handler.mssql_handler(source_connector, destination_connector)
         elif self.source_type == "postgresql":
             audit_handler.postgres_handler(source_connector, destination_connector)
-        
         else:
             raise ValueError("Unsupported database type")
 
-        
+        source_connector.stop_spark_session()
+        destination_connector.stop_spark_session()
+
+
     def etl(self):
         try:
             self.get_database_names()

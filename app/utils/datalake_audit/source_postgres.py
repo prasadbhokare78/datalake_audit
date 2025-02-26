@@ -13,7 +13,6 @@ def source_postgres_data(source_connector, source_name, database_type):
         if db_name == 'datalake_audit': 
             continue
         
-        print(f"Processing database: {db_name}")
         source_connector.set_url(db_name)
 
         table_query = f"""
@@ -24,7 +23,6 @@ def source_postgres_data(source_connector, source_name, database_type):
 
         try:
             tables_df = source_connector.read_table(table_query)
-            tables_df.show()
 
             for table_row in tables_df.collect():
                 table_name = table_row["table_name"]
@@ -42,7 +40,6 @@ def source_postgres_data(source_connector, source_name, database_type):
                 schema_df = source_connector.read_table(schema_query)
 
                 print(f"Table: {table_name}, Row Count: {row_count}")
-                schema_df.show()
 
             schema_dict = schema_df.select(
                 collect_list(col("column_name")).alias("columns"),
@@ -58,9 +55,6 @@ def source_postgres_data(source_connector, source_name, database_type):
         
     schema = ["source_name", "database_type", "database_name", "table_name", "row_count", "table_schema"]
     source_postgres_df = source_connector.create_dataframe(results, schema)
-
-    print("PostgreSQL Source Data:")
-    source_postgres_df.show()
 
     return source_postgres_df
  

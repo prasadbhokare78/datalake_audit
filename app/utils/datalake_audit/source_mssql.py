@@ -57,8 +57,5 @@ def source_mssql_data(source_connector, source_name, database_type):
     
     schema = ["source_name", "database_type", "database_name", "table_name", "row_count", "table_schema"]
     source_mssql_df = source_connector.create_dataframe(results, schema)
-    
-    print("MSSQL Source Data:")
-    source_mssql_df.show()
 
     return source_mssql_df

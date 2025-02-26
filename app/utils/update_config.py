@@ -33,7 +33,7 @@ class UpdateConfig():
         script_dir = os.path.abspath(__file__)
         app_dir = os.path.dirname(os.path.dirname(script_dir))
         config_dir = os.path.join(app_dir, "config", "db_config")
-        os.makedirs(config_dir, exist_ok=True)  # Ensure the directory exists
+        os.makedirs(config_dir, exist_ok=True) 
 
         connector = self.get_connector()
         
@@ -43,15 +43,13 @@ class UpdateConfig():
             print("No audit logs found. Exiting.")
             return
 
-        db_configs = {}  # Dictionary to group tables by (source, database)
+        db_configs = {} 
         
-        # [('mos', 'mos', 'void', '{"id": "int", "name": "varchar(20)"}', 'batch', 4, 'append', 1000, '2', 2, '10', 1, 4, 1, 2, '2025-02-21')
-
         for log in audit_logs:
             source_name, database_name, table_name, table_schema, fetch_type, hour_interval, mode, batch_size, executor_memory, executor_cores, driver_memory, min_executors, max_executors, initial_executors, driver_cores, date_col = log
 
             try:
-                table_schema = json.loads(table_schema)  # Parse table_schema as JSON
+                table_schema = json.loads(table_schema)  
             except json.JSONDecodeError:
                 print(f"Failed to parse JSON for {table_name}. Using empty schema.")
                 table_schema = {}
@@ -109,7 +107,6 @@ class UpdateConfig():
             })
 
         for (source_name, database_name), config_data in db_configs.items():
-            timestamp = int(time.time())  # Generate a unique timestamp
             file_name = f"{source_name}_{database_name}.json".lower()
             file_path = os.path.join(config_dir, file_name)
 

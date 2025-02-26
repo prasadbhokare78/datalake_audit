@@ -23,7 +23,6 @@ def source_oracle_data(source_connector, source_name, database_type):
         for table_row in tables_df.collect():
             table_name = table_row["TABLE_NAME"]
 
-            # Skip default system tables
             if table_name in default_tables:
                 continue
 
@@ -51,7 +50,5 @@ def source_oracle_data(source_connector, source_name, database_type):
 
     schema = ["source_name", "database_type", "database_name", "table_name", "row_count", "table_schema"]
     oracle_df = source_connector.create_dataframe(results, schema)
-
-    oracle_df.show()
 
     return oracle_df
