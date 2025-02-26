@@ -1,4 +1,4 @@
-from pyspark.sql.functions import col, to_json, collect_list, struct, current_date
+from pyspark.sql.functions import col, collect_list
 import json
 
 def source_mssql_data(source_connector, source_name, database_type):
@@ -30,12 +30,12 @@ def source_mssql_data(source_connector, source_name, database_type):
             for table_row in tables_df.collect():
                 table_name = table_row["TABLE_NAME"]
                 
-                # Fetch row count
+                
                 count_query = f"SELECT COUNT(*) AS row_count FROM {table_name}"
                 row_count_df = source_connector.read_table(count_query)
                 row_count = row_count_df.collect()[0]["row_count"]
                 
-                # Fetch schema
+                
                 schema_query = f"""
                     SELECT COLUMN_NAME, DATA_TYPE 
                     FROM INFORMATION_SCHEMA.COLUMNS
@@ -57,8 +57,5 @@ def source_mssql_data(source_connector, source_name, database_type):
     
     schema = ["source_name", "database_type", "database_name", "table_name", "row_count", "table_schema"]
     source_mssql_df = source_connector.create_dataframe(results, schema)
-    
-    print("MSSQL Source Data:")
-    source_mssql_df.show()
 
     return source_mssql_df

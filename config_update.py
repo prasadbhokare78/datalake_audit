@@ -7,21 +7,15 @@ from app.utils.update_config import UpdateConfig
 from dotenv import load_dotenv # type: ignore 5
 from pydantic import ValidationError # type: ignore
 
-# Load environment variables
 load_dotenv()
 
-# Define current directory and config folder
 current_directory = os.path.dirname(os.path.abspath(__file__))
 config_folder = os.path.join(current_directory, 'app', 'config')
 
 def update_config(source_name, source_type, source_params, schedule_time):
-    print(f"Processing source: {source_name}")
-    print(f"Source Type: {source_type}")
-    print(f"Source Parameters: {source_params}")
     UpdateConfig(source_name, source_type, source_params, schedule_time).update_config_files()
 
 
-# Default DAG arguments
 default_args = {
     "owner": "airflow",
     "depends_on_past": False,
@@ -40,19 +34,19 @@ if os.path.exists(config_file_path):
         schedule_time = config['dag_config']['schedule_time']
         
         dag = DAG(
-            dag_id="config_update_dag",
+            dag_id=dag_name,
             default_args=default_args,
             description=f"Dynamic DAG for {dag_name}",
             schedule_interval=schedule_time,
             catchup=False,
         )
-        print(config)
+
         source_name = config['source'][0]['name']
         source_type = config['source'][0]['database_type']
         source_params = config['source'][0]['param']
         schedule_time = config['dag_config']['schedule_time']
         task = PythonOperator(
-            task_id="process",
+            task_id=dag_name,
             python_callable=update_config,
             op_kwargs={
                 "source_name": source_name,
@@ -62,8 +56,6 @@ if os.path.exists(config_file_path):
                 },
             dag=dag,
         )
-
-
         globals()[dag_name] = dag
     except (FileNotFoundError, json.JSONDecodeError, ValidationError, KeyError, AttributeError) as e:
         print(f"Error processing config file: {e}") 

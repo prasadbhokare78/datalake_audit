@@ -2,15 +2,12 @@ from pyspark.sql import SparkSession
 import time
 from app.jar_files.jar_manager import JarManager
 from pyspark.sql.functions import year as spark_year, month as spark_month, dayofmonth as spark_dayofmonth, col
-from pyspark.sql.types import StructType, StructField, StringType, IntegerType
-# from app.constants.constant_error import SparkSessionError, DataReadError, DataWriteError
 
 
 class PostgresConnector:
     def __init__(self, host, port, user, password, database=""):
         self.jdbc_url = f"jdbc:postgresql://{host}:{port}/{database}"
         self.driver = "org.postgresql.Driver"
-        self.jar_path = "/home/iauro/airflow/dags/app/jar_files/postgresql-42.7.4.jar"
         self.user = user
         self.password = password
         self.spark_attempts = 0
@@ -23,7 +20,9 @@ class PostgresConnector:
         
         jar_manager = JarManager(
             required_jars=[
-                'postgresql-42.7.4.jar'
+                'postgresql-42.7.4.jar',
+                'ojdbc8.jar',
+                'mssql-jdbc-12.8.1.jre11.jar'
             ]
         )
 
@@ -34,7 +33,7 @@ class PostgresConnector:
             try:
                 self.spark = SparkSession.builder \
                     .appName("PostgresConnector") \
-                    .config("spark.jars", self.jar_path) \
+                    .config("spark.jars", self.all_jdbc_drivers_path) \
                     .getOrCreate()
                 break
             except Exception as e:
@@ -49,17 +48,6 @@ class PostgresConnector:
     def set_url(self, database):
         """Set the schema (namespace) for PostgreSQL queries."""
         self.jdbc_url = f"jdbc:postgresql://{self.host}:{self.port}/{database}"
-
-    def reinit_spark_session(self):
-        try:
-            self.spark.stop()
-            self.spark = SparkSession.builder \
-                .appName("PostgresConnector") \
-                .config("spark.jars", self.jar_path) \
-                .getOrCreate()
-            print("Spark session reinitialized successfully.")
-        except Exception as e:
-            raise Exception(str(e))
         
 
     def read_table(self, query):
@@ -125,6 +113,20 @@ class PostgresConnector:
                     time.sleep(self.retry_delay)
                 else:
                     raise Exception(str(e))
+                
+    def write_to_s3(self, df_data, destination_path, date_column):
+        try:
+            df_data = df_data.withColumn("year", spark_year(col(date_column))) \
+                             .withColumn("month", spark_month(col(date_column))) \
+                             .withColumn("day", spark_dayofmonth(col(date_column)))
+            print(f"DataFrame columns after adding partition columns: {df_data.columns}")
+
+            df_data.write.partitionBy("year", "month", "day") \
+                         .mode("append") \
+                         .parquet(destination_path)
+            print(f"Uploaded data to S3 path: {destination_path}")
+        except Exception as e:
+            raise Exception(str(e))
 
     def stop_spark_session(self):
         try:

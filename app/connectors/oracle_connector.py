@@ -1,14 +1,12 @@
 from pyspark.sql import SparkSession
-# from app.utils.s3_utils import S3Utils
 import time
 from app.jar_files.jar_manager import JarManager
 from pyspark.sql.functions import year as spark_year, month as spark_month, dayofmonth as spark_dayofmonth, col
-# from app.constants.constant_error import SparkSessionError, DataReadError, DataWriteError
 
 class OracleConnector:
-    def __init__(self, host, port, user, password, service="FREEPDB1"):
-        self.jdbc_url = f"jdbc:oracle:thin:@{host}:{port}/{service}"
-        self.jar_path = "/home/iauro/airflow/dags/app/jar_files/ojdbc8.jar"
+    def __init__(self, host, port, user, password):
+        self.service = "FREEPDB1"
+        self.jdbc_url = f"jdbc:oracle:thin:@{host}:{port}/{self.service}"
         self.driver = "oracle.jdbc.OracleDriver"
         self.user = user
         self.password = password
@@ -16,10 +14,15 @@ class OracleConnector:
         self.read_attempts = 0
         self.max_retries = 3
         self.retry_delay = 5
+        self.host = host
+        self.port = port
+        
         
         jar_manager = JarManager(
             required_jars=[
-                'ojdbc8.jar'
+                'postgresql-42.7.4.jar',
+                'ojdbc8.jar',
+                'mssql-jdbc-12.8.1.jre11.jar' 
             ]
         )
 
@@ -40,6 +43,36 @@ class OracleConnector:
                     time.sleep(self.retry_delay)
                 else:
                     raise Exception(str(e))
+                
+    def set_url(self, database):
+        """Set the schema (namespace) for PostgreSQL queries."""
+        self.jdbc_url = f"jdbc:oracle:thin:@{self.host}:{self.port}/{self.service}"
+
+    def reinit_spark_session(self):
+        try:
+            self.spark.stop()
+            self.spark = SparkSession.builder \
+                .appName("PostgresConnector") \
+                .config("spark.jars", self.jar_path) \
+                .getOrCreate()
+            print("Spark session reinitialized successfully.")
+        except Exception as e:
+            raise Exception(str(e))
+                
+    def create_dataframe(self, results, schema_list):
+        """
+        Create a Spark DataFrame from a list of tuples and a schema list.
+        
+        :param results: List of tuples containing the data.
+        :param schema_list: List of column names as strings.
+        :return: Spark DataFrame.
+        """
+        try:
+            df = self.spark.createDataFrame(results, schema=schema_list)
+            return df
+        except Exception as e:
+            return []
+        
     def read_table(self, query):
         while self.read_attempts < self.max_retries:
             try:
@@ -66,7 +99,6 @@ class OracleConnector:
                              .withColumn("day", spark_dayofmonth(col(date_column)))
             print(f"DataFrame columns after adding partition columns: {df_data.columns}")
 
-            # Write the DataFrame to S3 with partitioning
             df_data.write.partitionBy("year", "month", "day") \
                          .mode("append") \
                          .parquet(destination_path)

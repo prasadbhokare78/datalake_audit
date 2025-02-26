@@ -1,0 +1,52 @@
+{
+    "dag_config": {
+        "dag_name": "mos_finance_config_dag",
+        "schedule_time": "0 3 * * *"
+    },
+    "sources": {
+        "name": "mos",
+        "database_type": "mssql",
+        "param": {
+            "host": "localhost",
+            "port": "1433",
+            "user": "SA",
+            "password": "iauro7Z@qf3fT8"
+        }
+    },
+    "destination": {
+        "name": "datalake_audit",
+        "params": {
+            "host": "localhost",
+            "port": "5432",
+            "database": "datalake_audit",
+            "user": "postgres",
+            "password": "password"
+        }
+    },
+    "table_queries": [
+        {
+            "table_name": "show",
+            "table_params": {
+                "data_query": "SELECT * FROM show WHERE 2025-02-26 >= '{start_date_time}' AND 2025-02-26 < '{end_date_time}'",
+                "date_column": "2025-02-26",
+                "min_date_query": "SELECT min(2025-02-26) AS min_date FROM show",
+                "total_count_query": "SELECT count(*) AS total_count FROM show WHERE 2025-02-26 >= '{start_date_time}' AND 2025-02-26 < '{end_date_time}' ORDER BY {date_col} ASC, name ASC OFFSET {offset} LIMIT {batch_size}",
+                "schema": {
+                    "id": "int",
+                    "name": "varchar"
+                },
+                "fetch_type": "batch",
+                "mode": "append",
+                "executor_memory": 2,
+                "executor_cores": 4,
+                "driver_memory": 12,
+                "min_executors": 2,
+                "max_executors": 4,
+                "initial_executors": 2,
+                "driver_cores": 8,
+                "batch_size": 10000,
+                "batch_interval_in_hr": 2
+            }
+        }
+    ]
+}

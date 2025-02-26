@@ -4,21 +4,14 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator  # type: ignore
 from datetime import datetime, timedelta
 from app.utils.audit_manager import DatalakeAuditHandler
-from dotenv import load_dotenv # type: ignore 5
-from pydantic import ValidationError # type: ignore
+from dotenv import load_dotenv # type: ignore 2
 
-# Load environment variables
 load_dotenv()
 
-# Define current directory and config folder
 current_directory = os.path.dirname(os.path.abspath(__file__))
 config_folder = os.path.join(current_directory, 'app', 'config')
 
 def fetch_and_upload_data(source_name, source_type, source_params, destination_params):
-    print(f"Processing source: {source_name}")
-    print(f"Source Type: {source_type}")
-    print(f"Source Parameters: {source_params}")
-    print(f"Destination Parameters: {destination_params}")
     DatalakeAuditHandler(source_name, source_type, source_params, destination_params).etl()
 
 
@@ -32,7 +25,7 @@ default_args = {
     "retry_delay": timedelta(minutes=5),
 }
 
-config_file_path = os.path.join(config_folder, 'test.json')
+config_file_path = os.path.join(config_folder, 'config.json')
 if os.path.exists(config_file_path):
     try:
         with open(config_file_path) as f:
@@ -68,8 +61,7 @@ if os.path.exists(config_file_path):
 
 
         globals()[dag_name] = dag
-    except (FileNotFoundError, json.JSONDecodeError, ValidationError, KeyError, AttributeError) as e:
+    except (FileNotFoundError, json.JSONDecodeError, KeyError, AttributeError) as e:
         print(f"Error processing config file: {e}")
-# Set task dependencies (optional if it's just one task)
 
 

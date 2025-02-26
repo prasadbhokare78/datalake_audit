@@ -1,7 +1,5 @@
-from pyspark.sql.functions import col, to_json, collect_list, struct, current_date
+from pyspark.sql.functions import col, current_date
 from pyspark.sql.types import DateType
-import json
-
 
 def update_postgres(missing_df, connector, table_name):
     try:
@@ -19,13 +17,10 @@ def update_postgres(missing_df, connector, table_name):
 
 def missing_destination(destination_connector, source_df):
     schema = ["source_name", "database_type", "database_name", "table_name", "row_count", "table_schema"]
-    print('breakpoint')
     
     try:
         query = "SELECT source_name, database_type, database_name, table_name, row_count, table_schema FROM public.datalake_source_tracker"
         dest_df = destination_connector.read_table(query)
-        print("MSSQL Destination Data:")
-        dest_df.show()
     except Exception as e:
         print(f"⚠️ Error reading from MSSQL Destination: {e}")
         destination_connector.stop_spark_session()
@@ -34,25 +29,19 @@ def missing_destination(destination_connector, source_df):
     source_df = source_df.select(*schema)
     dest_df = dest_df.select(*schema)
 
-    common_df = source_df.alias("source").join(
-        dest_df.alias("dest"),
-        on=["source_name", "database_type", "database_name", "table_name"],
-        how="inner"
-    )
+    # common_df = source_df.alias("source").join(
+    #     dest_df.alias("dest"),
+    #     on=["source_name", "database_type", "database_name", "table_name"],
+    #     how="inner"
+    # )
 
-    row_count_mismatch_df = common_df.filter(col("source.row_count") != col("dest.row_count"))
+    # row_count_mismatch_df = common_df.filter(col("source.row_count") != col("dest.row_count"))
 
     missing_in_dest_df = source_df.join(
         dest_df,
         on=["source_name", "database_type", "database_name", "table_name"],
         how="left_anti"
     )
-
-    print("Row Count Mismatches:")
-    row_count_mismatch_df.show()
-
-    print("Missing in PostgreSQL Destination:")
-    missing_in_dest_df.show()
 
     missing_in_dest_df = missing_in_dest_df.withColumn("created_at", current_date())
     missing_in_dest_df = missing_in_dest_df.withColumn("updated_at", current_date().cast(DateType()))
