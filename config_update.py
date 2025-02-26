@@ -34,19 +34,19 @@ if os.path.exists(config_file_path):
         schedule_time = config['dag_config']['schedule_time']
         
         dag = DAG(
-            dag_id="config_update_dag",
+            dag_id=dag_name,
             default_args=default_args,
             description=f"Dynamic DAG for {dag_name}",
             schedule_interval=schedule_time,
             catchup=False,
         )
-        print(config)
+
         source_name = config['source'][0]['name']
         source_type = config['source'][0]['database_type']
         source_params = config['source'][0]['param']
         schedule_time = config['dag_config']['schedule_time']
         task = PythonOperator(
-            task_id="process",
+            task_id=dag_name,
             python_callable=update_config,
             op_kwargs={
                 "source_name": source_name,
