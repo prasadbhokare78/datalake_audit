@@ -1,0 +1,11 @@
+app/utils/__pycache__/
+app/utils/datalake_audit/__pycache
+app/connectors/__pycache__
+app/__pycache__
+.vscode
+__pycache__
+app/connectors/__init__.py
+app/jar_files/__pycache__
+app/utils/__init__.py
+app/utils/datalake_audit/__init__.py
+app/__init__.py

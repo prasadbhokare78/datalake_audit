@@ -1,5 +1,4 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import year as spark_year, month as spark_month, dayofmonth as spark_dayofmonth, col
 import time
 from app.jar_files.jar_manager import JarManager
 
@@ -20,7 +19,6 @@ class MSSQLConnector:
         jar_manager = JarManager(
             required_jars=[
                 'postgresql-42.7.4.jar',
-                'ojdbc8.jar',
                 'mssql-jdbc-12.8.1.jre11.jar'
             ]
         )
@@ -109,20 +107,6 @@ class MSSQLConnector:
                 else:
                     raise Exception(str(e))
 
-
-    def write_to_s3(self, df_data, destination_path, date_column):
-        try:
-            df_data = df_data.withColumn("year", spark_year(col(date_column))) \
-                             .withColumn("month", spark_month(col(date_column))) \
-                             .withColumn("day", spark_dayofmonth(col(date_column)))
-            print(f"DataFrame columns after adding partition columns: {df_data.columns}")
-
-            df_data.write.partitionBy("year", "month", "day") \
-                         .mode("append") \
-                         .parquet(destination_path)
-            print(f"Uploaded data to S3 path: {destination_path}")
-        except Exception as e:
-            raise Exception(str(e))
 
     def stop_spark_session(self):
         try:

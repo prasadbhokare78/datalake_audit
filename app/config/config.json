@@ -22,18 +22,18 @@
                 "port": "1433",
                 "user": "SA",
                 "password": "iauro7Z@qf3fT8"
-                }
-            },
-            {
-                "name" : "ameyo",
-                "database_type" : "postgresql",
-                "param" : {
-                    "host": "localhost",
-                    "port": "5432",
-                    "user": "postgres",
-                    "password": "password"
-                }
             }
+        },
+        {
+            "name" : "ameyo",
+            "database_type" : "postgresql",
+            "param" : {
+                "host": "localhost",
+                "port": "5432",
+                "user": "postgres",
+                "password": "password"
+            }
+        }
            
     ],
     "destinations" : [

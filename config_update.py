@@ -1,11 +1,11 @@
 import os
 import json
 from airflow import DAG
-from airflow.operators.python import PythonOperator # type: ignore 1
+from airflow.operators.python import PythonOperator 
 from datetime import datetime, timedelta
 from app.utils.update_config import UpdateConfig
-from dotenv import load_dotenv # type: ignore 5
-from pydantic import ValidationError # type: ignore
+from dotenv import load_dotenv 
+from pydantic import ValidationError
 
 load_dotenv()
 
