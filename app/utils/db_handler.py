@@ -10,25 +10,28 @@ class DatalakeHandler:
         self.source_params = config_data.get("source_params")
         self.destination_params = config_data.get("destination_params")
         self.destination_table = config_data.get("destination_params", {}).get("table_name")
+
+
+    def destination_handler(self, destination_connector, fetch_data):
+        """Handles data updates in the destination database (PostgreSQL)."""
         
+        missing_data = missing_destination(destination_connector, fetch_data)
+        update_postgres(missing_data, destination_connector, self.destination_table)
+
 
     def postgres_handler(self, source_connector, destination_connector):
-        """Returns the PostgreSQL destination connector."""
-        pass
+        """Fetches PostgreSQL source data and processes it."""
         fetch_data = source_postgres_data(source_connector, self.source_name, self.source_type)
-        missing_data = missing_destination(destination_connector, fetch_data)
-        update_postgres(missing_data, destination_connector, self.destination_table)
+        self.destination_handler(destination_connector, fetch_data)
 
+    
     def mssql_handler(self, source_connector, destination_connector):
-        """Returns the MSSQL destination connector."""
-        pass
+        """Fetches MSSQL source data and processes it."""
         fetch_data = source_mssql_data(source_connector, self.source_name, self.source_type)
-        missing_data = missing_destination(destination_connector, fetch_data)
-        update_postgres(missing_data, destination_connector, self.destination_table)
+        self.destination_handler(destination_connector, fetch_data)
+
 
     def oracle_handler(self, source_connector, destination_connector):
-        """Returns the Oracle destination connector."""
-        
+        """Fetches Oracle source data and processes it."""
         fetch_data = source_oracle_data(source_connector, self.source_name, self.source_type)
-        # missing_data = missing_destination(destination_connector, fetch_data)
-        # update_postgres(missing_data, destination_connector, self.destination_table)
+        self.destination_handler(destination_connector, fetch_data)

@@ -4,7 +4,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator  # type: ignore
 from datetime import datetime, timedelta
 from app.utils.audit_manager import DatalakeAuditHandler
-from dotenv import load_dotenv # type: ignore 5
+from dotenv import load_dotenv # type: ignore 2
 from pydantic import ValidationError # type: ignore
 
 load_dotenv()

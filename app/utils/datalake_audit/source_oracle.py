@@ -52,4 +52,6 @@ def source_oracle_data(source_connector, source_name, database_type):
     schema = ["source_name", "database_type", "database_name", "table_name", "row_count", "table_schema"]
     oracle_df = source_connector.create_dataframe(results, schema)
 
+    oracle_df.show()
+
     return oracle_df
