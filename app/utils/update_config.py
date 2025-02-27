@@ -82,13 +82,21 @@ class UpdateConfig():
                 else:
                     print(f"No matching source found for {source_name}. Skipping.")
                     continue
+            
+            if add_date_column and mod_date_column:
+                data_query = f"SELECT * FROM {table_name} WHERE ({add_date_column} >= '{{start_date_time}}' AND {add_date_column} < '{{end_date_time}}') OR ({mod_date_column} >= '{{start_date_time}}' AND {mod_date_column} < '{{end_date_time}}')"
+            elif add_date_column:
+                data_query = f"SELECT * FROM {table_name} WHERE {add_date_column} >= '{{start_date_time}}' AND {add_date_column} < '{{end_date_time}}'"
+            elif mod_date_column:
+                data_query = f"SELECT * FROM {table_name} WHERE {mod_date_column} >= '{{start_date_time}}' AND {mod_date_column} < '{{end_date_time}}'"
+                
 
             total_count_query = f"SELECT count(*) AS total_count FROM {table_name} WHERE {add_date_column} >= '{{start_date_time}}' AND {mod_date_column} < '{{end_date_time}}'"
             if fetch_type == "batch":
                 total_count_query += " ORDER BY {date_col} ASC, name ASC OFFSET {offset} LIMIT {batch_size}"
 
             table_params = {
-                "data_query": f"SELECT * FROM {table_name} WHERE {add_date_column} >= '{{start_date_time}}' AND {mod_date_column} < '{{end_date_time}}'",
+                "data_query": data_query,
                 "date_column": date_col,
                 "min_date_query": f"SELECT min({min_date_column}) AS min_date FROM {table_name}",
                 "total_count_query": total_count_query,
