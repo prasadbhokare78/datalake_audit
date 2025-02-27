@@ -1,11 +1,10 @@
 import os
 import json
 from airflow import DAG
-from airflow.operators.python import PythonOperator 
+from airflow.operators.python import PythonOperator  # type: ignore
 from datetime import datetime, timedelta
 from app.utils.update_config import UpdateConfig
-from dotenv import load_dotenv 
-from pydantic import ValidationError
+from dotenv import load_dotenv  # type: ignore
 
 load_dotenv()
 
@@ -57,5 +56,5 @@ if os.path.exists(config_file_path):
             dag=dag,
         )
         globals()[dag_name] = dag
-    except (FileNotFoundError, json.JSONDecodeError, ValidationError, KeyError, AttributeError) as e:
+    except (FileNotFoundError, json.JSONDecodeError, KeyError, AttributeError) as e:
         print(f"Error processing config file: {e}") 

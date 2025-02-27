@@ -81,7 +81,7 @@ class PostgresConnector:
             print(f"Error creating DataFrame: {e}")
             raise Exception(str(e))
 
-    def write_table(self, df, table_name, mode="append"):
+    def write_table(self, data, table_name, mode="append"):
         """
         Write a Spark DataFrame to a PostgreSQL table.
         
@@ -92,7 +92,7 @@ class PostgresConnector:
 
         while self.write_attempts < self.max_retries:
             try:
-                df.write \
+                data.write \
                     .format("jdbc") \
                     .option("url", self.jdbc_url) \
                     .option("dbtable", table_name) \

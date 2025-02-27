@@ -17,6 +17,7 @@ def source_oracle_data(source_connector, source_name, database_type):
     for row in databases_df.collect():
         db_name = row["OWNER"]  
 
+
         table_query = f"SELECT TABLE_NAME FROM ALL_TABLES WHERE OWNER = '{db_name}'"
         tables_df = source_connector.read_table(table_query)
 

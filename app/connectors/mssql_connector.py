@@ -59,6 +59,7 @@ class MSSQLConnector:
             print(f"Error creating DataFrame: {e}")
             raise Exception(str(e))
 
+
     def read_table(self, query):
         while self.read_attempts < self.max_retries:
             try:

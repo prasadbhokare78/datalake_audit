@@ -11,6 +11,8 @@
                 "host": "localhost",
                 "port": "5432",
                 "database": "datalake_audit",
+                "datalake_source_table": "datalake_source_tracker",
+                "datalake_execution_log_table": "config_execution_log",
                 "user": "postgres",
                 "password": "password"
             }

@@ -42,10 +42,11 @@ class OracleConnector:
                 else:
                     raise Exception(str(e))
                 
-    def set_url(self, database):
+    def set_url(self, user, password):
         """Set the schema (namespace) for PostgreSQL queries."""
-        self.jdbc_url = f"jdbc:oracle:thin:@{self.host}:{self.port}/{self.service}"
-
+        self.user = user 
+        self.password = password
+        
     def reinit_spark_session(self):
         try:
             self.spark.stop()
