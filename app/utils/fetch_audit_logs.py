@@ -19,7 +19,7 @@ def fetch_audit_logs(connector, table_name):
     records = filtered_df.select(
         "source_name", "database_type", "database_name", "table_name", "table_schema", "fetch_type", 
         "hour_interval", "mode", "batch_size", "executor_memory", "executor_cores", 
-        "driver_memory", "min_executors", "max_executors", "initial_executors", "driver_cores", "date_col",
+        "driver_memory", "min_executors", "max_executors", "initial_executors", "driver_cores", "date_column",
         "mod_date_column", "add_date_column", "min_date_column"
     ).collect()
 
@@ -28,12 +28,12 @@ def fetch_audit_logs(connector, table_name):
             row.source_name, row.database_type, row.database_name, row.table_name, row.table_schema, row.fetch_type, 
             row.hour_interval, row.mode, row.batch_size, row.executor_memory, row.executor_cores, 
             row.driver_memory, row.min_executors, row.max_executors, row.initial_executors, row.driver_cores,
-            row.date_col.strftime('%Y-%m-%d') if isinstance(row.date_col, datetime) else str(row.date_col), 
+            row.date_column.strftime('%Y-%m-%d') if isinstance(row.date_column, datetime) else str(row.date_column), 
             row.mod_date_column, row.add_date_column, row.min_date_column
         )
         for row in records if None not in [
             row.source_name, row.database_type, row.database_name, row.table_name, row.table_schema, 
-            row.fetch_type, row.mode, row.date_col, row.executor_memory, row.executor_cores, 
+            row.fetch_type, row.mode, row.date_column, row.executor_memory, row.executor_cores, 
             row.driver_memory, row.min_executors, row.max_executors, row.initial_executors, row.driver_cores,
             row.min_date_column
         ] and (row.mod_date_column is not None or row.add_date_column is not None)  

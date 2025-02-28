@@ -1,5 +1,4 @@
-from pyspark.sql.functions import col, collect_list
-import json
+from pyspark.sql.functions import col, collect_list, to_json
 
 def source_postgres_data(source_connector, source_name, database_type):
     exclude_dbs = ('datalake_audit', 'postgres', 'template0', 'template1')
@@ -39,14 +38,12 @@ def source_postgres_data(source_connector, source_name, database_type):
                 """
                 schema_df = source_connector.read_table(schema_query)
 
-                print(f"Table: {table_name}, Row Count: {row_count}")
-
             schema_dict = schema_df.select(
                 collect_list(col("column_name")).alias("columns"),
                 collect_list(col("data_type")).alias("datatypes")
             ).collect()[0]
 
-            schema_json = json.dumps(dict(zip(schema_dict["columns"], schema_dict["datatypes"])))
+            schema_json = dict(zip(schema_dict["columns"], schema_dict["datatypes"]))
 
             results.append((source_name, database_type, db_name, table_name, row_count, schema_json))
             
@@ -55,6 +52,7 @@ def source_postgres_data(source_connector, source_name, database_type):
         
     schema = ["source_name", "database_type", "database_name", "table_name", "row_count", "table_schema"]
     source_postgres_df = source_connector.create_dataframe(results, schema)
-
+    source_postgres_df = source_postgres_df.withColumn("table_schema", to_json(col("table_schema")))
+    
     return source_postgres_df
  

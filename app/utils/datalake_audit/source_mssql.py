@@ -1,5 +1,4 @@
-from pyspark.sql.functions import col, collect_list
-import json
+from pyspark.sql.functions import col, collect_list, to_json
 
 def source_mssql_data(source_connector, source_name, database_type):
     exclude_dbs = ('master', 'tempdb', 'model', 'msdb')
@@ -15,7 +14,6 @@ def source_mssql_data(source_connector, source_name, database_type):
     
     for row in databases_df.collect():
         db_name = row["name"]
-        print(f"Processing database: {db_name}")
         source_connector.set_url(db_name)
 
         table_query = """
@@ -48,8 +46,8 @@ def source_mssql_data(source_connector, source_name, database_type):
                     collect_list(col("DATA_TYPE")).alias("datatypes")
                 ).collect()[0]
                 
-                schema_json = json.dumps(dict(zip(schema_dict["columns"], schema_dict["datatypes"])))
-                
+                schema_json = dict(zip(schema_dict["columns"], schema_dict["datatypes"]))
+            
                 results.append((source_name, database_type, db_name, table_name, row_count, schema_json))
                 
         except Exception as e:
@@ -57,5 +55,8 @@ def source_mssql_data(source_connector, source_name, database_type):
     
     schema = ["source_name", "database_type", "database_name", "table_name", "row_count", "table_schema"]
     source_mssql_df = source_connector.create_dataframe(results, schema)
+    source_mssql_df = source_mssql_df.withColumn("table_schema", to_json(col("table_schema")))
+    
+    
 
     return source_mssql_df

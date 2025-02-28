@@ -3,6 +3,7 @@ import json
 from airflow import DAG
 from airflow.operators.python import PythonOperator  
 from datetime import datetime, timedelta
+from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from app.utils.audit_manager import DatalakeAuditHandler
 from dotenv import load_dotenv 
 
@@ -58,6 +59,8 @@ if os.path.exists(config_file_path):
                 },
                 dag=dag,
             )
+
+        
 
 
         globals()[dag_name] = dag

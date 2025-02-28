@@ -48,7 +48,7 @@ class UpdateConfig():
 
         db_configs = {} 
         for log in audit_logs:
-            source_name, source_type, database_name, table_name, table_schema, fetch_type, hour_interval, mode, batch_size, executor_memory, executor_cores, driver_memory, min_executors, max_executors, initial_executors, driver_cores, date_col, mod_date_column, add_date_column, min_date_column = log
+            source_name, source_type, database_name, table_name, table_schema, fetch_type, hour_interval, mode, batch_size, executor_memory, executor_cores, driver_memory, min_executors, max_executors, initial_executors, driver_cores, date_column, mod_date_column, add_date_column, min_date_column = log
 
             try:
                 table_schema = json.loads(table_schema)  
@@ -97,7 +97,7 @@ class UpdateConfig():
 
             table_params = {
                 "data_query": data_query,
-                "date_column": date_col,
+                "date_column": date_column,
                 "min_date_query": f"SELECT min({min_date_column}) AS min_date FROM {table_name}",
                 "total_count_query": total_count_query,
                 "schema": table_schema,

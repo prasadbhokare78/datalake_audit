@@ -99,6 +99,7 @@ class PostgresConnector:
                     .option("user", self.user) \
                     .option("password", self.password) \
                     .option("driver", self.driver) \
+                    .option("stringtype", "unspecified") \
                     .mode(mode) \
                     .save()
                 print(f"Data successfully written to {table_name}.")

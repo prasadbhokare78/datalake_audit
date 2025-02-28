@@ -1,0 +1,56 @@
+{
+    "dag_config": {
+        "dag_name": "ameyo_fin_config_dag",
+        "schedule_time": "0 3 * * *"
+    },
+    "sources": {
+        "name": "ameyo",
+        "database_name": "fin",
+        "database_type": "postgresql",
+        "param": {
+            "host": "localhost",
+            "port": "5432",
+            "user": "postgres",
+            "password": "password"
+        }
+    },
+    "destination": {
+        "name": "datalake_audit",
+        "params": {
+            "host": "localhost",
+            "port": "5432",
+            "database": "datalake_audit",
+            "datalake_source_table": "datalake_source_tracker",
+            "datalake_execution_log_table": "config_execution_log",
+            "user": "postgres",
+            "password": "password"
+        }
+    },
+    "table_queries": [
+        {
+            "table_name": "fin_1",
+            "table_params": {
+                "data_query": "SELECT * FROM fin_1 WHERE (mod_at >= '{start_date_time}' AND mod_at < '{end_date_time}') OR (mod_at >= '{start_date_time}' AND mod_at < '{end_date_time}')",
+                "date_column": "updated_at",
+                "min_date_query": "SELECT min(min_at) AS min_date FROM fin_1",
+                "total_count_query": "SELECT count(*) AS total_count FROM fin_1 WHERE mod_at >= '{start_date_time}' AND mod_at < '{end_date_time}' ORDER BY {date_col} ASC, name ASC OFFSET {offset} LIMIT {batch_size}",
+                "schema": {
+                    "id": "integer",
+                    "name": "character varying",
+                    "mobileno": "character varying"
+                },
+                "fetch_type": "batch",
+                "mode": "append",
+                "executor_memory": 2,
+                "executor_cores": 2,
+                "driver_memory": 2,
+                "min_executors": 2,
+                "max_executors": 2,
+                "initial_executors": 2,
+                "driver_cores": 2,
+                "batch_size": 10000,
+                "batch_interval_in_hr": 2
+            }
+        }
+    ]
+}
