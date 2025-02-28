@@ -1,6 +1,6 @@
 To build
 
-echo "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" | docker login ghcr.io -u prasadbhokare78 --password-stdin
+echo "$GITHUB_TOKEN" | docker login ghcr.io -u prasadbhokare78 --password-stdin
 
 docker build -t ghcr.io/prasadbhokare78/audit_pipeline:latest .
 
