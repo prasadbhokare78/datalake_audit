@@ -48,7 +48,7 @@ class UpdateConfig():
 
         db_configs = {} 
         for log in audit_logs:
-            source_name, source_type, database_name, table_name, table_schema, fetch_type, hour_interval, mode, batch_size, executor_memory, executor_cores, driver_memory, min_executors, max_executors, initial_executors, driver_cores, date_column, mod_date_column, add_date_column, min_date_column = log
+            source_name, source_type, database_name, table_name, table_schema, fetch_type, hour_interval, mode, batch_size, executor_memory, executor_cores, driver_memory, min_executors, max_executors, initial_executors, driver_cores, partition_upto, date_column, mod_date_column, add_date_column, min_date_column = log
 
             try:
                 table_schema = json.loads(table_schema)  
@@ -82,24 +82,52 @@ class UpdateConfig():
                 else:
                     print(f"No matching source found for {source_name}. Skipping.")
                     continue
+
+        # "data_query":"SELECT * FROM ClientMaster_Enabler WHERE ((adddate >= '{start_date_time}' and moddate is null) AND (adddate < '{end_date_time}' and moddate is null)) OR (adddate >= '{start_date_time}' AND adddate < '{end_date_time}')",
+        # "min_date_query":"SELECT min(adddate) AS min_date FROM ClientMaster_Enabler",
+        # "fetch_type":"hourly",
+        # "date_column" : "adddate",
+        # "partition_query":"WITH base AS ( SELECT *, COALESCE(moddate,adddate) AS final_date FROM partition_table ) SELECT *, YEAR(final_date) AS year, MONTH(final_date) AS month, DAY(final_date) AS day FROM base",
+        # "partition_upto":"day",             
+        
+
+            
+            
+            
             
             if add_date_column and mod_date_column:
-                data_query = f"SELECT * FROM {table_name} WHERE ({add_date_column} >= '{{start_date_time}}' AND {add_date_column} < '{{end_date_time}}') OR ({mod_date_column} >= '{{start_date_time}}' AND {mod_date_column} < '{{end_date_time}}')"
+                total_count_query = f"SELECT COUNT(*) AS total_count FROM {table_name} WHERE ({add_date_column} >= '{{start_date_time}}' AND {add_date_column} < '{{end_date_time}}') OR ({mod_date_column} >= '{{start_date_time}}' AND {mod_date_column} < '{{end_date_time}}')"
+
+                partition_query = f"WITH base AS ( SELECT *, COALESCE({add_date_column},{mod_date_column}) AS final_date FROM partition_table ) SELECT *, YEAR(final_date) AS year, MONTH(final_date) AS month, DAY(final_date) AS day FROM base"
+
+                data_query = f"select * from {table_name} where (({add_date_column}>='{{start_date_time}}' and {mod_date_column} is null) and ({add_date_column}<'{{end_date_time}}' and {mod_date_column} is null)) or ({mod_date_column}>='{{start_date_time}}' and {mod_date_column}<'{{end_date_time}}')" 
+
             elif add_date_column:
-                data_query = f"SELECT * FROM {table_name} WHERE {add_date_column} >= '{{start_date_time}}' AND {add_date_column} < '{{end_date_time}}'"
+                total_count_query = f"SELECT COUNT(*) AS total_count FROM {table_name} WHERE {add_date_column} >= '{{start_date_time}}' AND {add_date_column} < '{{end_date_time}}'"
+
+                partition_query = f"WITH base AS ( SELECT *, {add_date_column} AS final_date FROM partition_table ) SELECT *, YEAR(final_date) AS year, MONTH(final_date) AS month, DAY(final_date) AS day FROM base"
+
+                data_query = f"select * from {table_name} where {add_date_column}>='{{start_date_time}}'  and {add_date_column}<'{{end_date_time}}'')"
+
             elif mod_date_column:
-                data_query = f"SELECT * FROM {table_name} WHERE {mod_date_column} >= '{{start_date_time}}' AND {mod_date_column} < '{{end_date_time}}'"
+                total_count_query = f"SELECT COUNT(*) AS total_count FROM {table_name} WHERE {mod_date_column} >= '{{start_date_time}}' AND {mod_date_column} < '{{end_date_time}}'"
+
+                partition_query = f"WITH base AS ( SELECT *, {mod_date_column} AS final_date FROM partition_table ) SELECT *, YEAR(final_date) AS year, MONTH(final_date) AS month, DAY(final_date) AS day FROM base"
+
+                data_query = f"select * from {table_name} where {mod_date_column}>='{{start_date_time}}' and {mod_date_column}<'{{end_date_time}}'"
                 
 
-            total_count_query = f"SELECT count(*) AS total_count FROM {table_name} WHERE {add_date_column} >= '{{start_date_time}}' AND {mod_date_column} < '{{end_date_time}}'"
             if fetch_type == "batch":
-                total_count_query += " ORDER BY {date_col} ASC, name ASC OFFSET {offset} LIMIT {batch_size}"
+                data_query += f" ORDER BY {date_column} ASC, name ASC OFFSET {{offset}} LIMIT {{batch_size}}"
+
 
             table_params = {
                 "data_query": data_query,
                 "date_column": date_column,
-                "min_date_query": f"SELECT min({min_date_column}) AS min_date FROM {table_name}",
+                "min_date_query": f"SELECT MIN({min_date_column}) AS min_date FROM {table_name}",
                 "total_count_query": total_count_query,
+                "partition_query": partition_query,
+                "partition_upto": partition_upto,
                 "schema": table_schema,
                 "fetch_type": fetch_type,
                 "mode": mode,
@@ -109,7 +137,7 @@ class UpdateConfig():
                 "min_executors": min_executors,
                 "max_executors": max_executors,
                 "initial_executors": initial_executors,
-                "driver_cores": driver_cores
+                "driver_cores": driver_cores,
             }
 
             if fetch_type == "batch":
