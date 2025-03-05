@@ -7,14 +7,14 @@ from pyspark.sql.types import StructType, StructField, StringType, TimestampType
 
 
 class UpdateConfig():
-    def __init__(self, source_name, source_type, source_params, schedule_time):
+    def __init__(self, source_name, source_type, source_params, schedule_time, connector):
         self.source_name = source_name
         self.source_type = source_type
         self.source_params = source_params
         self.schedule_time = schedule_time
         self.datalake_source_table = source_params.get("datalake_source_table")
         self.datalake_execution_log_table = source_params.get("datalake_execution_log_table")
-        
+        self.connector = connector
         self.script_dir = os.path.abspath(__file__)
         self.app_dir = os.path.dirname(os.path.dirname(self.script_dir))
         self.config_path = os.path.join(self.app_dir, "config", "config.json")
@@ -23,15 +23,7 @@ class UpdateConfig():
             with open(self.config_path, "r") as f:
                 self.config_file = json.load(f)
 
-    def get_connector(self):
-        """Returns the PostgreSQL destination connector."""
-        return PostgresConnector(
-            host=self.source_params.get("host"),
-            port=self.source_params.get("port"),
-            user=self.source_params.get("user"),
-            password=self.source_params.get("password"),
-            database=self.source_params.get("database"),
-        )
+
 
     def update_config_files(self):
         script_dir = os.path.abspath(__file__)
@@ -39,8 +31,7 @@ class UpdateConfig():
         config_dir = os.path.join(app_dir, "config", "db_config")
         os.makedirs(config_dir, exist_ok=True) 
 
-        connector = self.get_connector()       
-        audit_logs = fetch_audit_logs(connector, self.datalake_source_table)
+        audit_logs = fetch_audit_logs(self.connector, self.datalake_source_table)
 
         if not audit_logs:
             print("No audit logs found. Exiting.")
@@ -83,18 +74,7 @@ class UpdateConfig():
                     print(f"No matching source found for {source_name}. Skipping.")
                     continue
 
-        # "data_query":"SELECT * FROM ClientMaster_Enabler WHERE ((adddate >= '{start_date_time}' and moddate is null) AND (adddate < '{end_date_time}' and moddate is null)) OR (adddate >= '{start_date_time}' AND adddate < '{end_date_time}')",
-        # "min_date_query":"SELECT min(adddate) AS min_date FROM ClientMaster_Enabler",
-        # "fetch_type":"hourly",
-        # "date_column" : "adddate",
-        # "partition_query":"WITH base AS ( SELECT *, COALESCE(moddate,adddate) AS final_date FROM partition_table ) SELECT *, YEAR(final_date) AS year, MONTH(final_date) AS month, DAY(final_date) AS day FROM base",
-        # "partition_upto":"day",             
-        
-
-            
-            
-            
-            
+    
             if add_date_column and mod_date_column:
                 total_count_query = f"SELECT COUNT(*) AS total_count FROM {table_name} WHERE ({add_date_column} >= '{{start_date_time}}' AND {add_date_column} < '{{end_date_time}}') OR ({mod_date_column} >= '{{start_date_time}}' AND {mod_date_column} < '{{end_date_time}}')"
 
@@ -178,7 +158,6 @@ class UpdateConfig():
                 StructField("database_name", StringType(), False),
                 StructField("last_execution_date", TimestampType(), False)
             ])
-            results = connector.create_dataframe(execution_records, schema)
-            connector.write_table(results, self.datalake_execution_log_table)
+            results = self.connector.create_dataframe(execution_records, schema)
+            self.connector.write_table(results, self.datalake_execution_log_table)
 
-        connector.stop_spark_session()

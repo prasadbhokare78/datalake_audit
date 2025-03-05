@@ -4,11 +4,12 @@ from app.jar_files.jar_manager import JarManager
 
 
 class PostgresConnector:
-    def __init__(self, host, port, user, password, database=""):
+    def __init__(self, host, port, user, password, database, spark):
         self.jdbc_url = f"jdbc:postgresql://{host}:{port}/{database}"
         self.driver = "org.postgresql.Driver"
         self.user = user
         self.password = password
+        self.spark = spark
         self.spark_attempts = 0
         self.read_attempts = 0
         self.write_attempts = 0

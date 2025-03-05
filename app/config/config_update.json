@@ -17,6 +17,17 @@
                 "password": "password"
             }
         }
+    ],
+    "spark_operator_args": [
+        {
+            "executor_memory": "4g",
+            "executor_cores": "4",
+            "driver_memory": "4g",
+            "min_executors": "2",
+            "max_executors": "2",
+            "initial_executors": "2",
+            "driver_cores": "2"
+        }
     ]
 }
  
